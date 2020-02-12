@@ -2,7 +2,7 @@
 
 from pyspark.sql import SparkSession 
 import sys
-#from pyspark.sql.functions import *
+from pyspark.sql.functions import *
 
 spark = SparkSession \
     .builder \
@@ -24,6 +24,20 @@ def readTable(source, numPartitions):
         .load(source)  \
         .cache()
     return table0
+
+# function to changing the location column to latitude and longitude columns
+def changeLatLong(dfName):
+    df = dfName
+    df = df.withColumn('Longitude', regexp_extract(col('Location'), '([-.\d]+)([,\s]+)([.\d]+)', 1))\
+        .withColumn('Latitude', regexp_extract(col('Location'), '([-.\d]+)([,\s]+)([.\d]+)', 3))\
+        .drop('Location')
+    double_type = ['Latitude', 'Longitude']
+    for c in double_type:
+        df = df.withColumn(c, round(df[c].cast('DOUBLE'),8))
+    df.show(5)
+    df.printSchema()
+    return df
+
 
 # function to pre-process parking data frames in spark 
 def transformTable(dfName):
@@ -74,12 +88,12 @@ def collisionTable(dfName):
     # drop extra columns and rename selected columns
     drop_name = ['OBJECTID', 'INCKEY', 'COLDETKEY', 'REPORTNO',\
         'STATUS', 'INTKEY', 'EXCEPTRSNCODE', 'EXCEPTRSNDESC', \
-        'INATTENTIONIND', 'SDOT_COLCODE', 'ST_COLDESC', 'INCDTTM',\
+        'INATTENTIONIND', 'SDOT_COLCODE', 'ST_COLDESC', 'INCDATE',\
         'UNDERINFL', 'PEDROWNOTGRNT','SDOTCOLNUM','SPEEDING',\
         'SEGLANEKEY','CROSSWALKKEY','PEDCOUNT','PEDCYLCOUNT',\
         'JUNCTIONTYPE','ST_COLCODE', 'SEVERITYCODE']
     mapping = {'SEVERITYDESC':'Severity','COLLISIONTYPE':'CollisionType',\
-        'INCDATE': 'DateTime', 'ADDRTYPE':'AddressType', 'LOCATION': 'Location',\
+        'INCDTTM': 'DateTime', 'ADDRTYPE':'AddressType', 'LOCATION': 'Location',\
         'PERSONCOUNT':'PersonCount', 'VEHCOUNT':'VehCount',\
         'INJURIES':'Injuries', 'SERIOUSINJURIES': 'SeriousInjur',\
         'FATALITIES': 'Fatal', 'SDOT_COLDESC':'CollisionDesc',
@@ -88,6 +102,7 @@ def collisionTable(dfName):
         'HITPARKEDCAR':'HitParkedCar'}
     new_names = [mapping.get(col,col) for col in df.columns]
     df = df.toDF(*new_names).drop(*drop_name).na.drop(subset=['Latitude','Longitude'])
+    df = df.withColumn('DateTime', unix_timestamp(df.DateTime, 'MM/dd/yyyy hh:mm:ss a').cast('timestamp'))
 
     #uniform the lat and long format with the ones in the parking data frame
     df = df.withColumn('Longitude', round(df['Longitude'],8))\

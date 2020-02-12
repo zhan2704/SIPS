@@ -21,6 +21,11 @@ for table in range(len(source)):
 	pre = readTable(tabNow, numPartitions)
 	print("Read in table " + tabNow + " successfully!")
 
+	# change the location data for 2018 and 2019 data
+	if table != 0:
+			pre = changeLatLong(pre)
+			print("Transformed table " + tabNow + " successfully!")
+
 	parking = transformTable(pre)
 	print("Transformed table " + tabNow + " successfully!")
 

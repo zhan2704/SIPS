@@ -18,3 +18,7 @@ Imagining when parking on-street, the least thing a car owner want is his or her
 * Paid Parking Occupancy 2017 (Archived): https://data.seattle.gov/Transportation/Paid-Parking-Occupancy-2017-Archived-/t96b-taja
 * Seattle Collision Data: http://data-seattlecitygis.opendata.arcgis.com/datasets/collisions/data
 
+## Caveat
+
+Make sure spark env is set up with **Java 8** for compatibility.
+

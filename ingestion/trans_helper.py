@@ -56,25 +56,26 @@ def transformTable(dfName):
         df = df.withColumn(c, df[c].cast("INT"))
     for c in double_type:
         df = df.withColumn(c, df[c].cast('DOUBLE'))
-    df = df.withColumn('DateTime', unix_timestamp(df.DateTime, 'MM/dd/yy HH:mm')\
+    df = df.withColumn('datetime', unix_timestamp(df.datetime, 'MM/dd/yy HH:mm')\
         .cast('timestamp'))
     df.printSchema()
 
     # seperate the date and time columns and calc the occupancy rate
-    hourly_info = ['ID', 'Latitude', 'Longitude', 'PaidOccupancy', 'ParkingSpaceCount', \
+    hourly_info = ['id', 'Latitude', 'Longitude', 'PaidOccupancy', 'ParkingSpaceCount', \
         'BlockfaceName', 'SideOfStreet']
-    hourly = df.select(date_trunc("hour", df.DateTime).alias('DateTime'), *hourly_info)
-    hourly = hourly.withColumn("date", to_date(hourly.DateTime))\
-        .withColumn("time", hour(hourly.DateTime)).drop("DateTime").dropna()\
+    hourly = df.select(date_trunc("hour", df.datetime).alias('datetime'), *hourly_info)
+    hourly = hourly.withColumn("date", to_date(hourly.datetime))\
+        .withColumn("time", hour(hourly.datetime)).drop("datetime").dropna()\
         .withColumn("OccupancyRate", round(hourly['PaidOccupancy']/hourly['ParkingSpaceCount'], 4))
  
     # groupby hourly occupancy rate with hourly-avg numbers
-    hourly_df = hourly.groupBy("Date", "Time", "id")\
+    hourly_df = hourly.groupBy("date", "time", "id")\
         .agg(round(avg("OccupancyRate"), 4).alias('occupanc_rate'),\
             first('Latitude').alias('lat'),\
             first('Longitude').alias('long'),\
             first('BlockfaceName').alias('blockface_name'),\
-            first('SideOfStreet').alias('streetside'))
+            first('SideOfStreet').alias('streetside'),\
+            first('ParkingSpaceCount').alias('total_space'))
     
     hourly_df.show(20)
     print(hourly_df.count())
@@ -93,7 +94,7 @@ def collisionTable(dfName):
         'SEGLANEKEY','CROSSWALKKEY','PEDCOUNT','PEDCYLCOUNT',\
         'JUNCTIONTYPE','ST_COLCODE', 'SEVERITYCODE']
     mapping = {'SEVERITYDESC':'severity','COLLISIONTYPE':'collision_type',\
-        'INCDTTM': 'DateTime', 'ADDRTYPE':'address_type', 'LOCATION': 'location',\
+        'INCDTTM': 'datetime', 'ADDRTYPE':'address_type', 'LOCATION': 'location',\
         'PERSONCOUNT':'person_count', 'VEHCOUNT':'veh_count',\
         'INJURIES':'injuries', 'SERIOUSINJURIES': 'serious_injur',\
         'FATALITIES': 'fatal', 'SDOT_COLDESC':'collision_desc',
@@ -102,13 +103,13 @@ def collisionTable(dfName):
         'HITPARKEDCAR':'hit_parked_car'}
     new_names = [mapping.get(col,col) for col in df.columns]
     df = df.toDF(*new_names).drop(*drop_name).na.drop(subset=['lat','long'])
-    df = df.withColumn('DateTime', unix_timestamp(df.DateTime, 'MM/dd/yyyy hh:mm:ss a').cast('timestamp'))
+    df = df.withColumn('datetime', unix_timestamp(df.datetime, 'MM/dd/yyyy hh:mm:ss a').cast('timestamp'))
 
     #uniform the lat and long format with the ones in the parking data frame
     df = df.withColumn('long', round(df['long'],8))\
         .withColumn('lat', round(df['lat'],8))\
-        .withColumn("date", to_date(df.DateTime))\
-        .withColumn("time", hour(df.DateTime)).drop("DateTime")
+        .withColumn("date", to_date(df.datetime))\
+        .withColumn("time", hour(df.datetime)).drop("datetime")
 
     # select collision records in the same scope with parking occupancy data
     df = df.filter(year(df.date).isin([2017, 2018, 2019]))

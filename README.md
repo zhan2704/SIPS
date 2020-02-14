@@ -5,7 +5,7 @@ Imagining when parking on-street, the least thing a car owner want is his or her
 
 ## Pipeline
 
-
+![image](https://user-images.githubusercontent.com/57073578/74552670-923d9c80-4f0a-11ea-94a1-4f349b360265.png)
 
 ## Challenge 
 

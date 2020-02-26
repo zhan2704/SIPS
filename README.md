@@ -13,21 +13,29 @@ When finding parkings, the least thing a car owner want is his or her car gets h
 
 ### Challenge 1: How to transfer the data
 
-![image](https://user-images.githubusercontent.com/57073578/75393914-f0bc3080-58a3-11ea-9a08-d755bdbe1b8f.png)
+![image](https://user-images.githubusercontent.com/57073578/75395165-a25c6100-58a6-11ea-8a30-05fd2ec59158.png)
 
 Due to the large amount of data from separate tables from 2017 to 2019, it will take extremely long time to transfer data directly from S3 to PostgreSQL. Thus, Spark is being used to complete the data transferring process.
 
 Some more reasons for choosing Spark in this project:
 
-![image](https://user-images.githubusercontent.com/57073578/75394168-6cb67880-58a4-11ea-8538-e7fc02487f2f.png)
+![image](https://user-images.githubusercontent.com/57073578/75395201-b7d18b00-58a6-11ea-8cdd-3e1207beef83.png)
 
 ### Challenge 2: Different schema 
+
+![image](https://user-images.githubusercontent.com/57073578/75395241-cfa90f00-58a6-11ea-89e7-05cbc0e2dc70.png)
 
 The schema of the geo-location data in the parking datasets are different. Thus, a pre-processing function has been defined in the transfer_helper.py to unify the information before further processing the data.
 
 ### Challenge 3: Tradeoff between saving storage and computation speed
 
-![image](https://user-images.githubusercontent.com/57073578/75394892-02063c80-58a6-11ea-879e-c3fb4a9ccec3.png)
+![image](https://user-images.githubusercontent.com/57073578/75395279-e6e7fc80-58a6-11ea-8167-b4107faf4c87.png)
+
+![image](https://user-images.githubusercontent.com/57073578/75395313-f9623600-58a6-11ea-923d-0785680cd5fd.png)
+
+![image](https://user-images.githubusercontent.com/57073578/75395336-08e17f00-58a7-11ea-9661-b74af884a97b.png)
+
+![image](https://user-images.githubusercontent.com/57073578/75395356-16970480-58a7-11ea-810d-577888ccdd3c.png)
 
 After testing out several different techniques, groupby was selected to conduct the pre-processing work considering the storage it needed for store the information and the speed it can achieve the computation.
 

@@ -56,7 +56,7 @@ def transformTable(dfName):
         df = df.withColumn(c, df[c].cast("INT"))
     for c in double_type:
         df = df.withColumn(c, df[c].cast('DOUBLE'))
-    df = df.withColumn('datetime', unix_timestamp(df.datetime, 'MM/dd/yy HH:mm')\
+    df = df.withColumn('datetime', unix_timestamp(df.datetime, 'MM/dd/yyyy HH:mm:ss')\
         .cast('timestamp'))
     df.printSchema()
 

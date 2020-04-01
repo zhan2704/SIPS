@@ -5,6 +5,9 @@ Safety Information near Parking Surroundings
 
 When finding parkings, the least thing a car owner want is his or her car gets hitted or scraped. However, more than half of car collisions are actually associated with parked cars. The SIPS platform aims at to provide the historical information about collision events and parking occupancy rates near a selected destination from users, so that the user can be aware of how's the parking surrounding situation look like. 
 
+SIPS Demo Link:
+https://www.youtube.com/watch?v=5uUbmavmpVk&t=9s
+
 ## Pipeline
 
 ![image](https://user-images.githubusercontent.com/57073578/74552670-923d9c80-4f0a-11ea-94a1-4f349b360265.png)
